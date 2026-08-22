@@ -188,11 +188,11 @@ pub fn delivery_time_from_filename(filename: &str) -> Option<u64> {
 }
 
 pub fn pick_received_at(filename: &str, mtime_unix: u64, date_header: Option<&str>) -> String {
-    if let Some(secs) = delivery_time_from_filename(filename) {
-        return format_unix_rfc3339(secs);
-    }
     if let Some(d) = date_header {
         return d.to_owned();
+    }
+    if let Some(secs) = delivery_time_from_filename(filename) {
+        return format_unix_rfc3339(secs);
     }
     if mtime_unix > 0 {
         return format_unix_rfc3339(mtime_unix);
