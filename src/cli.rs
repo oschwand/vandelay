@@ -1132,7 +1132,7 @@ pub struct ExchangeGraphImportArgs {
     #[arg(
         long,
         value_name = "LIST",
-        help = "Comma-separated surface list: mail | calendar | contacts (default: all three)"
+        help = "Comma-separated surface list: mail | calendar | contacts | files (default: all)"
     )]
     objects: Option<String>,
 
@@ -1160,6 +1160,32 @@ pub struct ExchangeGraphImportArgs {
         help = "Per-page size ($top query parameter, range [1, 1000])"
     )]
     top: usize,
+
+    #[arg(
+        long,
+        value_name = "N",
+        default_value_t = 5,
+        help = "Years either side of today to scan for edited recurrence occurrences (max 5)",
+        long_help = "Years either side of today to scan for edited recurrence occurrences.\n  \
+            Graph reports a series exception only inside an expanded calendar view, and caps\n  \
+            any single view at five years, so vandelay scans [today - N, today] and\n  \
+            [today, today + N]. An occurrence edited outside that span imports with the\n  \
+            series default instead of its edit."
+    )]
+    exception_window_years: i32,
+
+    #[arg(
+        long,
+        help = "Skip contact photos (saves one request per contact on large address books)",
+        long_help = "Skip contact photos.\n              Graph will not say which contacts have a photo: $expand=photo comes back empty\n              even when one exists, so the only way to find out is to ask for the bytes.\n              vandelay therefore spends one extra request per contact. Pass this to skip\n              photos entirely on a large address book."
+    )]
+    skip_contact_photos: bool,
+
+    #[arg(
+        long,
+        help = "Skip event file attachments (they are stored as JSCalendar enclosure links)"
+    )]
+    skip_event_attachments: bool,
 
     #[arg(
         long,
@@ -1225,6 +1251,9 @@ fn resolve_exchange_graph_import(args: ExchangeGraphImportArgs) -> Result<Action
             event_body_format,
             graph_connections,
             top,
+            exception_window_years: args.exception_window_years,
+            contact_photos: !args.skip_contact_photos,
+            event_attachments: !args.skip_event_attachments,
             allow_source_change: args.allow_source_change,
         },
     ))
@@ -1389,7 +1418,8 @@ mod tests {
             Surfaces {
                 mail: false,
                 calendar: false,
-                contacts: true
+                contacts: true,
+                files: false
             }
         );
     }

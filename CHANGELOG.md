@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.11] - 2026-09-28
+
+### Added
+
+### Changed
+- Replaced `base64` with `encodify`.
+
+### Fixed
+- IMAP: import failed after authenticating to Dovecot when a capability contained `:`, such as `IMAPSIEVE=sieve://...` (fixes #43)
+
+## [1.0.10] - 2026-08-27
+
+### Added
+- MS Exchange Graph: 
+    - OneDrive files import.
+    - Graph contact photos, categories and IM addresses.
+    - Graph event file attachments.
+
+### Changed
+
+### Fixed
+- MS Exchange Graph: 
+    - Import the default Contacts folder, recover series exceptions (fixes #39)
+    - Graph deleted recurrence occurrences were not excluded.
+    - `bySetPosition` was emitted on every Graph recurrence rule.
+    - Graph read, flagged and category state was dropped.
+    - A contact folder reachable by two paths aborted the run.
+    - IM addresses were dropped on export for lacking a `uri`.
+    - A redirect warning logged a OneDrive download credential.
+
 ## [1.0.9] - 2026-08-22
 
 ### Added
